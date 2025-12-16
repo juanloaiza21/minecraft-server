@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft-deployment
+  labels:
+    app: minecraft
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minecraft
+  template:
+    metadata:
+      labels:
+        app: minecraft
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: minecraft
+          image: itzg/minecraft-server:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "4Gi"
+              cpu: "1"
+            limits:
+              memory: "6Gi"
+              cpu: "2"
+          ports:
+            - containerPort: 25565
+              name: minecraft
+          envFrom:
+            - configMapRef:
+                name: minecraft-config
+            - secretRef:
+                name: minecraft-secret
+          volumeMounts:
+            - name: minecraft-data
+              mountPath: /data
+          stdin: true
+          tty: true
+      volumes:
+        - name: minecraft-data
+          persistentVolumeClaim:
+            claimName: minecraft-pvc
