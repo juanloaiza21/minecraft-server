@@ -1,1 +1,3 @@
 .env
+# Never commit real secrets
+k8s/secret.yaml
